@@ -25,10 +25,15 @@ RUN pip install --no-cache-dir numpy==1.23.5 && \
     pip install --no-cache-dir tensorflow-io-gcs-filesystem==0.23.1 && \
     pip install --no-cache-dir protobuf==3.19.6 && \
     pip install --no-cache-dir note-seq==0.0.3 && \
+    pip install --no-cache-dir flask==2.3.3 && \
     pip install --no-cache-dir -e magenta-main
 
 # Set environment variables
 ENV PYTHONPATH=/app/magenta-main:$PYTHONPATH
+ENV PORT=8080
+
+# Expose the port
+EXPOSE 8080
 
 # Run the EDM generation script
 CMD ["python", "generate_edm.py"]
