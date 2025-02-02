@@ -1,11 +1,27 @@
 import os
 import tensorflow as tf
 import note_seq
+from flask import Flask, jsonify, send_file, render_template
 from magenta.models.drums_rnn import drums_rnn_sequence_generator
 from magenta.models.music_vae import configs
 from magenta.models.music_vae.trained_model import TrainedModel
 from magenta.music import midi_io, sequences_lib, constants
 from magenta.protobuf import generator_pb2, music_pb2
+
+app = Flask(__name__)
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/download')
+def download_midi():
+    output_file = os.path.join(os.environ.get('OUTPUT_DIR', '.'), 'futuristic_edm.mid')
+    return send_file(output_file, as_attachment=True)
 
 def create_buildup_sequence(sequence, steps=16):
     """Create a tension-building sequence by gradually increasing velocity and density"""
@@ -89,4 +105,13 @@ def create_edm_track():
     print(f"Generated EDM track saved as {output_file}")
 
 if __name__ == '__main__':
+    # Create output directory if it doesn't exist
+    output_dir = os.environ.get('OUTPUT_DIR', '.')
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Generate the EDM track
     create_edm_track()
+    
+    # Run the Flask server
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
