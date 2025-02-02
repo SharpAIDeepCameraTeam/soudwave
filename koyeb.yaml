@@ -2,17 +2,27 @@ name: soudwave-edm
 service:
   name: edm-generator
   ports:
-    - port: 80
+    - port: 8080
       protocol: http
   routes:
     - path: /
       public: true
+  healthCheck:
+    port: 8080
+    path: /health
+    initialDelay: 30s
+    interval: 15s
+    timeout: 5s
+    successThreshold: 1
+    failureThreshold: 3
   scaling:
     min: 1
     max: 1
   envs:
     - key: TF_FORCE_GPU_ALLOW_GROWTH
       value: "true"
+    - key: PORT
+      value: "8080"
   resources:
     cpu: 1000m
     memory: 2048Mi
